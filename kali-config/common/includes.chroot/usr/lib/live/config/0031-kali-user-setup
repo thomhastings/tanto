@@ -31,6 +31,26 @@ configure_usergroups() {
     done
 }
 
+pkg_installed() {
+    dpkg -s "$1" 2>/dev/null | grep -q "ok installed"
+}
+
+configure_terminal() {
+    while read -r desktop terminal; do
+	pkg_installed kali-desktop-$desktop || continue
+	update-alternatives --verbose --set x-terminal-emulator /usr/bin/$terminal || true
+	break
+    done <<END
+e17   terminology
+gnome gnome-terminal.wrapper
+i3    kitty
+kde   konsole
+lxde  lxterminal
+mate  mate-terminal.wrapper
+xfce  qterminal
+END
+}
+
 # Avoid configuring multiple times in case persistence is enabled
 if [ -e /var/lib/live/config/kali-user-setup ]; then
     exit 0
@@ -39,11 +59,10 @@ fi
 # Set "kali" as password for the user kali
 usermod -p 'AqLUsDitNnTsw' kali
 
-# Change default shell to zsh
+# Apply various configuration
 configure_zsh
-
-# Add kali user to additional groups
 configure_usergroups
+configure_terminal
 
 # Remember that this script has been run
 touch /var/lib/live/config/kali-user-setup
