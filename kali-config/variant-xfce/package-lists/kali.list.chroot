@@ -17,3 +17,17 @@ kali-desktop-xfce
 
 # Kali applications
 #<package>
+enum4linux-ng
+eyewitness
+feroxbuster
+macchanger
+payloadsallthethings
+seclists
+
+# The Amnesic Network Toolkit for Offense
+curl
+detox
+htop
+secure-delete
+tor
+vim
