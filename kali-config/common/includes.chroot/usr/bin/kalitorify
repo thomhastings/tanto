@@ -143,13 +143,17 @@ setup_general() {
         fi
     done
 
-    # directories
+    # directories (create them)
     if [[ ! -d "${backup_dir}" ]]; then
-        die "directory '${backup_dir}' not exist, run makefile first!"
+        printf "No backups directory detected, creating it."
+        mkdir -p ${backup_dir}
+    #    die "directory '${backup_dir}' not exist, run makefile first!"
     fi
 
     if [[ ! -d "${data_dir}" ]]; then
-        die "directory '${data_dir}' not exist, run makefile first!"
+        printf "No data directory detected, creating it."
+        mkdir -p ${data_dir}
+    #    die "directory '${data_dir}' not exist, run makefile first!"
     fi
 
     # replace torrc file
