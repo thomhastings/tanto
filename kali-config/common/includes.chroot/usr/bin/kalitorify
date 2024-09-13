@@ -4,11 +4,11 @@
 #                                                                              #
 # kalitorify.sh                                                                #
 #                                                                              #
-# version: 1.29.0                                                              #
+# version: 1.29.1                                                              #
 #                                                                              #
 # Kali Linux - Transparent proxy through Tor                                   #
 #                                                                              #
-# Copyright (C) 2015-2022 brainf+ck                                            #
+# Copyright (C) 2015-2022 brainf+ck, (C) 2024 Thom Hastings                    #
 #                                                                              #
 # Kalitorify is KISS version of Parrot AnonSurf Module of Parrot OS:           #
 # - https://www.parrotsec.org                                                  #
@@ -37,9 +37,9 @@
 #
 # program information
 readonly prog_name="kalitorify"
-readonly version="1.29.0"
-readonly signature="Copyright (C) 2022 brainf+ck"
-readonly git_url="https://github.com/brainfucksec/kalitorify"
+readonly version="1.29.1"
+readonly signature="Copyright (C) 2022 brainf+ck, (C) 2024 Thom Hastings"
+readonly git_url="https://github.com/thomhastings/kalitorify"
 
 # set colors for stdout
 export red="$(tput setaf 1)"
@@ -82,7 +82,7 @@ printf "${b}${white}
                                 |___| v${version}
 
 =[ Transparent proxy through Tor
-=[ brainfucksec
+=[ brainfucksec, Thom Hastings
 ${reset}\\n\\n"
 }
 
@@ -136,7 +136,7 @@ setup_general() {
     info "Check program settings"
 
     # packages
-    declare -a dependencies=('tor' 'curl' 'iptables')
+    declare -a dependencies=('tor' 'curl' 'iptables' 'macchanger')
     for package in "${dependencies[@]}"; do
         if ! hash "${package}" 2>/dev/null; then
             die "'${package}' isn't installed, exit"
@@ -318,6 +318,39 @@ check_ip() {
 }
 
 
+## Randomize MAC address
+#
+# Use macchanger to randomize MAC address of UP interfaces
+macchanger_start() {
+    check_root
+
+    info "Randomize MAC address"
+
+    IFACES=`ip -br l | tr -s ' ' | cut -d ' ' -f 1,2 | grep "UP" | awk '$1 !~ "lo|vir" {print $1}'`
+    for IFACE in $IFACES
+    do
+        printf "Randomizing MAC address for $IFACE\n"
+        macchanger -A $IFACE
+    done
+}
+
+## Restore MAC address
+#
+# Use macchanger to restore original MAC address of UP interfaces
+macchanger_stop() {
+    check_root
+
+    info "Restore MAC address"
+
+    IFACES=`ip -br l | tr -s ' ' | cut -d ' ' -f 1,2 | grep "UP" | awk '$1 !~ "lo|vir" {print $1}'`
+    for IFACE in $IFACES
+    do
+        printf "Restoring original MAC address for $IFACE\n"
+        macchanger -p $IFACE
+    done
+}
+
+
 ## Check status of program and services
 #
 # - tor.service
@@ -367,6 +400,10 @@ start() {
     banner
     sleep 2
     setup_general
+
+    # Randomize MAC address
+    echo
+    macchanger_start
 
     printf "\\n"
     info "Starting Transparent Proxy"
@@ -433,6 +470,11 @@ stop() {
         cp "${backup_dir}/torrc.backup" /etc/tor/torrc
 
         printf "\\n${b}${green}%s${reset} %s\\n" "[-]" "Transparent Proxy stopped"
+
+        # Restore MAC address
+        echo
+        macchanger_stop
+
         exit 0
     else
         die "Tor service is not running! exit"
@@ -531,4 +573,3 @@ main() {
 
 # Call main
 main "${@}"
-
