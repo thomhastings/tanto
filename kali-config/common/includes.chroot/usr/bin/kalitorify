@@ -145,13 +145,13 @@ setup_general() {
 
     # directories (create them)
     if [[ ! -d "${backup_dir}" ]]; then
-        printf "No backups directory detected, creating it."
+        echo "No backups directory detected, creating it."
         mkdir -p ${backup_dir}
     #    die "directory '${backup_dir}' not exist, run makefile first!"
     fi
 
     if [[ ! -d "${data_dir}" ]]; then
-        printf "No data directory detected, creating it."
+        echo "No data directory detected, creating it."
         mkdir -p ${data_dir}
     #    die "directory '${data_dir}' not exist, run makefile first!"
     fi
