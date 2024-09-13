@@ -28,6 +28,7 @@ seclists
 curl
 detox
 htop
+iptables
 secure-delete
 tor
 vim
