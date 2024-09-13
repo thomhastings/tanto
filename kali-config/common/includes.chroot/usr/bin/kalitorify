@@ -136,7 +136,7 @@ setup_general() {
     info "Check program settings"
 
     # packages
-    declare -a dependencies=('tor' 'curl')
+    declare -a dependencies=('tor' 'curl' 'iptables')
     for package in "${dependencies[@]}"; do
         if ! hash "${package}" 2>/dev/null; then
             die "'${package}' isn't installed, exit"
