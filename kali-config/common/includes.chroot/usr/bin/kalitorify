@@ -139,7 +139,18 @@ setup_general() {
     declare -a dependencies=('tor' 'curl' 'iptables' 'macchanger')
     for package in "${dependencies[@]}"; do
         if ! hash "${package}" 2>/dev/null; then
-            die "'${package}' isn't installed, exit"
+            read -r -p "'${package}' isn't installed, install dependencies over clearnet? [y/N] " response
+            if [[ "$response" =~ ^[Yy] ]]; then
+                apt-get update && apt-get install -y ${dependencies[@]}
+                if [ $? -eq 0 ]; then
+                    echo "Successfully installed dependencies."
+                    echo
+                else
+                    die "Failed to install '${package}'"
+                fi
+            else
+                die "'${package}' isn't installed, exit"
+            fi
         fi
     done
 
