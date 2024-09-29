@@ -146,7 +146,7 @@ setup_general() {
                     echo "Successfully installed dependencies."
                     echo
                 else
-                    die "Failed to install '${package}'"
+                    die "Failed to install dependencies, exit"
                 fi
             else
                 die "'${package}' isn't installed, exit"
